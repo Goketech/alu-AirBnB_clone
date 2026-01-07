@@ -64,24 +64,50 @@ class FileStorage:
             with open(FileStorage.__file_path, 'r', encoding='utf-8') as f:
                 obj_dict = json.load(f)
 
-            from models.base_model import BaseModel
-            from models.user import User
-            from models.state import State
-            from models.city import City
-            from models.amenity import Amenity
-            from models.place import Place
-            from models.review import Review
-
-            # Map class names to actual classes
-            class_map = {
-                'BaseModel': BaseModel,
-                'User': User,
-                'State': State,
-                'City': City,
-                'Amenity': Amenity,
-                'Place': Place,
-                'Review': Review
-            }
+            # Import classes dynamically to avoid ImportError
+            class_map = {}
+            
+            try:
+                from models.base_model import BaseModel
+                class_map['BaseModel'] = BaseModel
+            except ImportError:
+                pass
+            
+            try:
+                from models.user import User
+                class_map['User'] = User
+            except ImportError:
+                pass
+            
+            try:
+                from models.state import State
+                class_map['State'] = State
+            except ImportError:
+                pass
+            
+            try:
+                from models.city import City
+                class_map['City'] = City
+            except ImportError:
+                pass
+            
+            try:
+                from models.amenity import Amenity
+                class_map['Amenity'] = Amenity
+            except ImportError:
+                pass
+            
+            try:
+                from models.place import Place
+                class_map['Place'] = Place
+            except ImportError:
+                pass
+            
+            try:
+                from models.review import Review
+                class_map['Review'] = Review
+            except ImportError:
+                pass
 
             for key, value in obj_dict.items():
                 class_name = value['__class__']
