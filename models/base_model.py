@@ -61,7 +61,8 @@ class BaseModel:
 
     def save(self):
         """
-        Update the updated_at attribute with current datetime and save to storage.
+        Update the updated_at attribute with current datetime and save
+        to storage.
         """
         from models import storage
 
