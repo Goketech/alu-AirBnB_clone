@@ -133,7 +133,8 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, arg):
         """
-        Print string representation of all instances or all instances of a class.
+        Print string representation of all instances or all instances
+        of a class.
         Usage: all [class name]
         """
         all_objs = storage.all()
