@@ -7,6 +7,13 @@ and deserialization of instances to/from JSON file.
 """
 import json
 import os
+from models.base_model import BaseModel
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 
 
 class FileStorage:
@@ -48,70 +55,24 @@ class FileStorage:
         obj_dict = {}
         for key, obj in FileStorage.__objects.items():
             obj_dict[key] = obj.to_dict()
-
-        with open(FileStorage.__file_path, 'w', encoding='utf-8') as f:
-            json.dump(obj_dict, f)
+        try:
+            with open(FileStorage.__file_path, 'w', encoding='utf-8') as f:
+                json.dump(obj_dict, f, indent=2)
+        except FileNotFoundError:
+            pass
 
     def reload(self):
         """
         Deserialize the JSON file to __objects if file exists.
         If file doesn't exist, do nothing (no exception raised).
         """
-        if not os.path.exists(FileStorage.__file_path):
-            return
-
         try:
-            with open(FileStorage.__file_path, 'r', encoding='utf-8') as f:
-                obj_dict = json.load(f)
+            with open(FileStorage.__file_path, 'r') as file:
+                obj_dict = json.load(file)
 
-            # Import classes dynamically to avoid ImportError
-            class_map = {}
-            
-            try:
-                from models.base_model import BaseModel
-                class_map['BaseModel'] = BaseModel
-            except ImportError:
-                pass
-            
-            try:
-                from models.user import User
-                class_map['User'] = User
-            except ImportError:
-                pass
-            
-            try:
-                from models.state import State
-                class_map['State'] = State
-            except ImportError:
-                pass
-            
-            try:
-                from models.city import City
-                class_map['City'] = City
-            except ImportError:
-                pass
-            
-            try:
-                from models.amenity import Amenity
-                class_map['Amenity'] = Amenity
-            except ImportError:
-                pass
-            
-            try:
-                from models.place import Place
-                class_map['Place'] = Place
-            except ImportError:
-                pass
-            
-            try:
-                from models.review import Review
-                class_map['Review'] = Review
-            except ImportError:
-                pass
+                for key, value in obj_dict.items():
+                    self.__objects[key] = eval(
+                        f"{value['__class__']}(**{value})")
 
-            for key, value in obj_dict.items():
-                class_name = value['__class__']
-                if class_name in class_map:
-                    FileStorage.__objects[key] = class_map[class_name](**value)
-        except Exception:
+        except FileNotFoundError:
             pass
