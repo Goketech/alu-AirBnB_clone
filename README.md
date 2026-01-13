@@ -6,17 +6,48 @@ This is the first step towards building a full web application: an AirBnB clone.
 
 The console provides a simple command-line interface to create, retrieve, update, and delete objects such as Users, States, Cities, Places, Amenities, and Reviews. All data is persisted to a JSON file, implementing a complete serialization/deserialization flow.
 
+This stage focuses on understanding object-oriented programming, data persistence, and building a reusable core that later layers (API, web, database) will rely on.
+
+## Learning Objectives
+
+By working on this project, you should gain practical experience with:
+
+* Building a custom command-line interface in Python
+* Object-oriented programming (classes, inheritance, encapsulation)
+* Serialization and deserialization of Python objects
+* File-based data persistence using JSON
+* Writing clean, modular, and testable code
+* Understanding how a backend system evolves incrementally
+
+
 ## Command Interpreter
 
 The command interpreter is similar to a shell but is limited to managing AirBnB objects. It allows you to:
 
-- Create new objects (User, State, City, Place, etc.)
-- Retrieve objects from file storage
-- Perform operations on objects (count, compute stats, etc.)
-- Update object attributes
-- Destroy objects
+* Create new objects (User, State, City, Place, etc.)
+* Retrieve objects from file storage
+* Perform operations on objects (count, compute stats, etc.)
+* Update object attributes
+* Destroy objects
 
-### How to Start the Console
+Internally, the interpreter parses user input, validates commands and arguments, and delegates operations to the storage engine.
+
+## Supported Models
+
+The console currently supports the following models:
+
+* `BaseModel`
+* `User`
+* `State`
+* `City`
+* `Amenity`
+* `Place`
+* `Review`
+
+All models inherit from `BaseModel`, which defines common attributes such as `id`, `created_at`, and `updated_at`.
+
+
+## How to Start the Console
 
 To start the console in interactive mode, run:
 
@@ -24,24 +55,32 @@ To start the console in interactive mode, run:
 ./console.py
 ```
 
-### How to Use the Console
+Make sure the file is executable:
+
+```bash
+chmod +x console.py
+```
+
+
+## How to Use the Console
 
 Once the console is running, you'll see the prompt `(hbnb)`. You can then enter commands.
 
 **Available Commands:**
 
-- `quit` or `EOF` - Exit the console
-- `help` - Display help information
-- `help <command>` - Display help for a specific command
-- `create <class>` - Create a new instance of a class
-- `show <class> <id>` - Display the string representation of an instance
-- `destroy <class> <id>` - Delete an instance
-- `all [class]` - Display all instances or all instances of a class
-- `update <class> <id> <attribute> <value>` - Update an instance attribute
+* `quit` or `EOF` - Exit the console
+* `help` - Display help information
+* `help <command>` - Display help for a specific command
+* `create <class>` - Create a new instance of a class
+* `show <class> <id>` - Display the string representation of an instance
+* `destroy <class> <id>` - Delete an instance
+* `all [class]` - Display all instances or all instances of a class
+* `update <class> <id> <attribute> <value>` - Update an instance attribute
 
-### Examples
 
-**Interactive Mode:**
+## Examples
+
+### Interactive Mode:
 
 ```bash
 $ ./console.py
@@ -67,7 +106,7 @@ EOF  help  quit  create  show  destroy  all  update
 $
 ```
 
-**Non-Interactive Mode:**
+### Non-Interactive Mode:
 
 ```bash
 $ echo "help" | ./console.py
@@ -83,6 +122,15 @@ $ echo "create BaseModel" | ./console.py
 (hbnb)
 $
 ```
+
+## Storage Engine
+
+This project uses a file-based storage system implemented in `file_storage.py`.
+
+* All objects are stored in a single JSON file
+* Each object is uniquely identified using a UUID
+* Objects are serialized when saved and deserialized when loaded
+* The storage engine is designed to be replaceable by a database backend in later stages
 
 ## Project Structure
 
@@ -110,6 +158,7 @@ alu-AirBnB_clone/
 └── README.md           # This file
 ```
 
+
 ## Testing
 
 All tests are located in the `tests/` directory and use the Python `unittest` module.
@@ -132,14 +181,25 @@ Tests can also be run in non-interactive mode:
 echo "python3 -m unittest discover tests" | bash
 ```
 
+## Limitations
+
+* No database integration (file storage only)
+* No authentication or authorization
+* No web interface at this stage
+* Error handling is minimal and focused on core functionality
+
+These limitations are intentional and addressed in later phases of the project.
+
+
 ## Requirements
 
-- Python 3.8.5 or higher
-- Ubuntu 20.04 LTS
-- Code must be PEP8 compliant (pycodestyle version 2.7.*)
-- All files must be executable
-- All modules, classes, and functions must have documentation
+* Python 3.8.5 or higher
+* Ubuntu 20.04 LTS
+* Code must be PEP8 compliant (pycodestyle version 2.7.*)
+* All files must be executable
+* All modules, classes, and functions must have documentation
 
 ## Authors
 
 See the [AUTHORS](AUTHORS) file for a list of contributors to this project.
+
