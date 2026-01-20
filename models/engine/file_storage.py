@@ -3,7 +3,7 @@
 FileStorage module
 
 This module defines the FileStorage class which handles serialization
-and deserialization of instances to/from JSON file.
+and deserialization of instances to/from a JSON file.
 """
 import json
 import os
@@ -11,12 +11,12 @@ import os
 
 class FileStorage:
     """
-    FileStorage class serializes instances to JSON file and
+    FileStorage class serializes instances to a JSON file and
     deserializes JSON file to instances.
 
-    Attributes:
-        __file_path (str): Path to the JSON file
-        __objects (dict): Dictionary storing all objects by <class name>.id
+    Private class attributes:
+        __file_path (str): path to the JSON file
+        __objects (dict): stores all objects by <class name>.id
     """
 
     __file_path = "file.json"
@@ -27,7 +27,7 @@ class FileStorage:
         Return the dictionary __objects.
 
         Returns:
-            dict: Dictionary of all objects
+            dict: dictionary of all stored objects
         """
         return FileStorage.__objects
 
@@ -36,7 +36,7 @@ class FileStorage:
         Set in __objects the obj with key <obj class name>.id.
 
         Args:
-            obj: Object to add to __objects
+            obj: object to add to storage
         """
         key = "{}.{}".format(obj.__class__.__name__, obj.id)
         FileStorage.__objects[key] = obj
@@ -45,73 +45,45 @@ class FileStorage:
         """
         Serialize __objects to the JSON file (path: __file_path).
         """
-        obj_dict = {}
-        for key, obj in FileStorage.__objects.items():
-            obj_dict[key] = obj.to_dict()
-
-        with open(FileStorage.__file_path, 'w', encoding='utf-8') as f:
+        obj_dict = {key: obj.to_dict()
+                    for key, obj in FileStorage.__objects.items()}
+        with open(FileStorage.__file_path, "w", encoding="utf-8") as f:
             json.dump(obj_dict, f)
 
     def reload(self):
         """
-        Deserialize the JSON file to __objects if file exists.
-        If file doesn't exist, do nothing (no exception raised).
+        Deserialize the JSON file to __objects (if the file exists).
+
+        If the JSON file (__file_path) does not exist, do nothing.
+        No exception should be raised in that case.
         """
         if not os.path.exists(FileStorage.__file_path):
             return
 
-        try:
-            with open(FileStorage.__file_path, 'r', encoding='utf-8') as f:
-                obj_dict = json.load(f)
+        with open(FileStorage.__file_path, "r", encoding="utf-8") as f:
+            obj_dict = json.load(f)
 
-            # Import classes dynamically to avoid ImportError
-            class_map = {}
-            
-            try:
-                from models.base_model import BaseModel
-                class_map['BaseModel'] = BaseModel
-            except ImportError:
-                pass
-            
-            try:
-                from models.user import User
-                class_map['User'] = User
-            except ImportError:
-                pass
-            
-            try:
-                from models.state import State
-                class_map['State'] = State
-            except ImportError:
-                pass
-            
-            try:
-                from models.city import City
-                class_map['City'] = City
-            except ImportError:
-                pass
-            
-            try:
-                from models.amenity import Amenity
-                class_map['Amenity'] = Amenity
-            except ImportError:
-                pass
-            
-            try:
-                from models.place import Place
-                class_map['Place'] = Place
-            except ImportError:
-                pass
-            
-            try:
-                from models.review import Review
-                class_map['Review'] = Review
-            except ImportError:
-                pass
+        # Import model classes only when reloading to avoid circular imports
+        from models.base_model import BaseModel
+        from models.user import User
+        from models.state import State
+        from models.city import City
+        from models.amenity import Amenity
+        from models.place import Place
+        from models.review import Review
 
-            for key, value in obj_dict.items():
-                class_name = value['__class__']
-                if class_name in class_map:
-                    FileStorage.__objects[key] = class_map[class_name](**value)
-        except Exception:
-            pass
+        class_map = {
+            "BaseModel": BaseModel,
+            "User": User,
+            "State": State,
+            "City": City,
+            "Amenity": Amenity,
+            "Place": Place,
+            "Review": Review,
+        }
+
+        for key, value in obj_dict.items():
+            class_name = value.get("__class__")
+            cls = class_map.get(class_name)
+            if cls is not None:
+                FileStorage.__objects[key] = cls(**value)
